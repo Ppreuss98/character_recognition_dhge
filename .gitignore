@@ -1,3 +1,9 @@
+#IntelliJ
+.DS_Store
+.idea
+
+#logs
+logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
