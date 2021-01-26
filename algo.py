@@ -1,5 +1,4 @@
 import csv
-from PIL import Image
 import numpy as np
 import tensorflow as tf
 import time
@@ -105,6 +104,8 @@ def start():
     # Array 2 has to iterate through whole trained data (array 2)
     index_list = []
     probability_list = []
+    is_correct_number_list = []
+    amount_correct = 0
     # 1st loop through tested data
     for i in range(tested_data_size):
         # reset of probability on each tested object
@@ -134,11 +135,23 @@ def start():
             if j == trained_data_size - 1:
                 index_list.append(index)
                 probability_list.append(probability_best)
+    # Check if descriptor of trained data corresponds to the test data descriptor
+    for i in index_list:
+        if trained_y[i] == test_y[i]:
+            print('Trained number: ' + str(trained_y[i]) + ', Tested number:' + str(test_y[i]))
+            is_correct_number_list.append(True)
+            amount_correct = amount_correct + 1
+        else:
+            print('Trained number: ' + str(trained_y[i]) + ', Tested number:' + str(test_y[i]))
+            is_correct_number_list.append(False)
 
     print("Indexes of best elements: ")
     print(index_list)
     print("Probabilities of best elements: ")
     print(probability_list)
+    print("List of correctly recognized numbers: ")
+    print(is_correct_number_list)
+    print('Amount of correct matches: ' + str(amount_correct))
     time_end = time.time()
     print(time_end - time_start)
 
