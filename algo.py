@@ -1,10 +1,9 @@
-import csv
 import numpy as np
 import tensorflow as tf
 import time
 
 tested_data_size = 10
-trained_data_size = 600
+trained_data_size = 10000
 
 
 def load_training_data_x():
@@ -77,17 +76,17 @@ def convert_x_test_data():
 
 def convert_y_data():
     train_3d = load_training_data_y()
-    converted_dataset = np.zeros(6000)
-    for i in range(6000):
+    converted_dataset = np.zeros(len(train_3d))
+    for i in range(len(train_3d)):
         converted_dataset[i] = train_3d[i]
     return converted_dataset
 
 
 def convert_y_test_data():
-    train_3d = load_test_data_y()
-    converted_dataset = np.zeros(6000)
-    for i in range(6000):
-        converted_dataset[i] = train_3d[i]
+    test_3d = load_test_data_y()
+    converted_dataset = np.zeros(len(test_3d))
+    for i in range(len(test_3d)):
+        converted_dataset[i] = test_3d[i]
     return converted_dataset
 
 
@@ -97,7 +96,6 @@ def start():
     trained_y = convert_y_data()
     test_x = convert_x_test_data()
     test_y = convert_y_test_data()
-    check_array = np.zeros((tested_data_size, 28))
 
     # Check trained data vs tested data
     # False, array checks only corresponding entries
@@ -135,14 +133,19 @@ def start():
             if j == trained_data_size - 1:
                 index_list.append(index)
                 probability_list.append(probability_best)
+
+    test_descriptor_list = []
+    for i in range(len(test_y)):
+        test_descriptor_list.append((int(test_y[i])))
+
     # Check if descriptor of trained data corresponds to the test data descriptor
-    for i in index_list:
-        if trained_y[i] == test_y[i]:
-            print('Trained number: ' + str(trained_y[i]) + ', Tested number:' + str(test_y[i]))
+    for i, j in zip(index_list, test_descriptor_list):
+        if trained_y[i] == test_descriptor_list[j]:
+            print('Trained number: ' + str(trained_y[i]) + ', Tested number:' + str(test_y[j]))
             is_correct_number_list.append(True)
             amount_correct = amount_correct + 1
         else:
-            print('Trained number: ' + str(trained_y[i]) + ', Tested number:' + str(test_y[i]))
+            print('Trained number: ' + str(trained_y[i]) + ', Tested number:' + str(test_y[j]))
             is_correct_number_list.append(False)
 
     print("Indexes of best elements: ")
