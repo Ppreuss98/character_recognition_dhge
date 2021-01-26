@@ -2,11 +2,12 @@ import numpy as np
 import tensorflow as tf
 import time
 
-tested_data_size = 10
-trained_data_size = 10000
+tested_data_size = 5
+trained_data_size = 600
 
 
 def load_training_data_x():
+    print("Loading MNIST Dataset...")
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     return x_train
@@ -32,6 +33,7 @@ def load_test_data_y():
 
 def convert_x_data():
     train_3d = load_training_data_x()
+    print("Converting x-data to binary...")
     sub_dataset = np.zeros((trained_data_size, 28, 28))
     converted_dataset = np.zeros((trained_data_size, 28, 28))
 
@@ -75,6 +77,7 @@ def convert_x_test_data():
 
 
 def convert_y_data():
+    print("Converting y-data...")
     train_3d = load_training_data_y()
     converted_dataset = np.zeros(len(train_3d))
     for i in range(len(train_3d)):
@@ -91,6 +94,7 @@ def convert_y_test_data():
 
 
 def start():
+    print("Starting...")
     time_start = time.time()
     trained_x = convert_x_data()
     trained_y = convert_y_data()
@@ -105,6 +109,7 @@ def start():
     is_correct_number_list = []
     amount_correct = 0
     # 1st loop through tested data
+    print("Testing dataset...")
     for i in range(tested_data_size):
         # reset of probability on each tested object
         # index - index of best trained element for the tested element
@@ -132,31 +137,19 @@ def start():
             # at the end of 2nd loop the index_list and probability_lists are updated
             if j == trained_data_size - 1:
                 index_list.append(index)
-                probability_list.append(probability_best)
+                probability_list.append(str(round(probability_best * 100, 2)) + '%')
 
-    test_descriptor_list = []
-    for i in range(len(test_y)):
-        test_descriptor_list.append((int(test_y[i])))
+    # create final list of 'recognized' numbers
+    final_list = []
+    for i in index_list:
+        final_list.append(trained_y[i])
 
-    # Check if descriptor of trained data corresponds to the test data descriptor
-    for i, j in zip(index_list, test_descriptor_list):
-        if trained_y[i] == test_descriptor_list[j]:
-            print('Trained number: ' + str(trained_y[i]) + ', Tested number:' + str(test_y[j]))
-            is_correct_number_list.append(True)
-            amount_correct = amount_correct + 1
-        else:
-            print('Trained number: ' + str(trained_y[i]) + ', Tested number:' + str(test_y[j]))
-            is_correct_number_list.append(False)
+    for i in range(len(probability_list)):
+        print('Probability: ' + probability_list[i] + ' | Number: ' + str(final_list[i]))
 
-    print("Indexes of best elements: ")
-    print(index_list)
-    print("Probabilities of best elements: ")
-    print(probability_list)
-    print("List of correctly recognized numbers: ")
-    print(is_correct_number_list)
-    print('Amount of correct matches: ' + str(amount_correct))
     time_end = time.time()
-    print(time_end - time_start)
+    print('Runtime: ' + str(round(time_end - time_start, 2)) + ' seconds with ' + str(trained_data_size)
+          + ' training data entries and ' + str(tested_data_size) + ' test data entries')
 
 
 start()
