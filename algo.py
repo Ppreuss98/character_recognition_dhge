@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 import time
 
-tested_x_data_size = 10
-trained_x_data_size = 60000
+tested_x_data_size = 100
+trained_x_data_size = 1000
 
 
 def load_data():
@@ -36,18 +36,21 @@ def initialize_datasets():
     return trained_x, trained_y, test_x, test_y
 
 
-def print_results(pr_list, t_numbers, final_list, correct, time_input):
+def print_results(pr_list, t_numbers, final_list, correct, time_input, m_prob):
     for i in range(len(pr_list)):
         print('Probability: ' + str(pr_list[i]) + ' | Number: ' + str(
             final_list[i]) + ' | Correct number: ' + str(t_numbers[i]))
 
     time_end = time.time()
     print('Amount of correct numbers: ' + str(correct))
+    print('Mean probability: ' + str(round(m_prob, 2)))
     print('Runtime: ' + str(round(time_end - time_input, 2)) + ' seconds with ' + str(trained_x_data_size)
           + ' training data entries and ' + str(tested_x_data_size) + ' test data entries')
 
 
 def check_matches(trained_x, trained_y, test_x, test_y):
+    print("Checking matches...")
+    print("\n")
     index_list = []
     probability_list = []
 
@@ -61,7 +64,7 @@ def check_matches(trained_x, trained_y, test_x, test_y):
         for j in range(trained_x_data_size):
             current_trained_x = trained_x[j]
             matches = current_tested_x[:28, :28] == current_trained_x[:28, :28]
-            probability = np.count_nonzero(matches == 0) / np.count_nonzero(matches)
+            probability = np.divide(np.count_nonzero(matches == 0), np.count_nonzero(matches))
 
             # If probability of an entry is higher, then probability and index for the corresponding y-value get updated
             if probability > probability_best:
@@ -70,27 +73,31 @@ def check_matches(trained_x, trained_y, test_x, test_y):
 
         # Creation of final probability list which contains likeness of found number with the tested number
         index_list.append(index)
-        probability_list.append(round(probability_best * 100, 2))
+        probability_list.append(round(np.multiply(probability_best, 100), 2))
 
     # Counter for correct amount of recognized numbers
     # (y-trained entries at index of index_list compared with y-tested entries)
     final_list = np.take(trained_y, index_list)
     test_numbers = test_y[:tested_x_data_size]
     amount_correct = np.count_nonzero(test_numbers == final_list)
+    mean_probability = np.divide(np.sum(probability_list), np.size(probability_list))
 
-    return probability_list, test_numbers, final_list, amount_correct
+    return probability_list, test_numbers, final_list, amount_correct, mean_probability
 
 
 def start():
     print("Starting...")
     time_start = time.time()
-    print("Testing dataset...")
 
     trained_x, trained_y, test_x, test_y = initialize_datasets()
-    probability_list, test_numbers, final_list, amount_correct = check_matches(trained_x, trained_y, test_x, test_y)
+    probability_list, test_numbers, final_list, amount_correct, mean_probability = \
+        check_matches(trained_x, trained_y, test_x, test_y)
 
     print_results(pr_list=probability_list, t_numbers=test_numbers, final_list=final_list, correct=amount_correct,
-                  time_input=time_start)
+                  time_input=time_start, m_prob=mean_probability)
+
+    print("\n")
+    print("Exiting...")
 
 
 start()
