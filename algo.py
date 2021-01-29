@@ -2,104 +2,40 @@ import numpy as np
 import tensorflow as tf
 import time
 
-tested_data_size = 5
-trained_data_size = 600
+tested_x_data_size = 1
+trained_x_data_size = 1
+trained_y_data = 10000
 
 
-def load_training_data_x():
-    print("Loading MNIST Dataset...")
+def load_data():
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    return x_train
+    return x_train, y_train, x_test, y_test
 
 
-def load_training_data_y():
-    mnist = tf.keras.datasets.mnist
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    return y_train
-
-
-def load_test_data_x():
-    mnist = tf.keras.datasets.mnist
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    return x_test
-
-
-def load_test_data_y():
-    mnist = tf.keras.datasets.mnist
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    return y_test
-
-
-def convert_x_data():
-    train_3d = load_training_data_x()
+def convert_x_data(data, size):
     print("Converting x-data to binary...")
-    sub_dataset = np.zeros((trained_data_size, 28, 28))
-    converted_dataset = np.zeros((trained_data_size, 28, 28))
-
-    # Trim dataset to x entries
-    for i in range(trained_data_size):
-        for j in range(28):
-            sub_dataset[i][j] = train_3d[i][j]
-
-    # Covert 0-255 to 0 and 1
-    for i in range(trained_data_size):
-        for j in range(28):
-            for k in range(28):
-                if sub_dataset[i][j][k] > 127:
-                    converted_dataset[i][j][k] = 1
-                else:
-                    converted_dataset[i][j][k] = 0
-
+    threshold = 127
+    width, height = 28, 28
+    sub_dataset = data[:size, :width, :height]
+    converted_dataset = sub_dataset > threshold
     return converted_dataset
 
 
-def convert_x_test_data():
-    train_3d = load_test_data_x()
-    sub_dataset = np.zeros((tested_data_size, 28, 28))
-    converted_dataset = np.zeros((tested_data_size, 28, 28))
-
-    # Trim dataset to x entries
-    for i in range(tested_data_size):
-        for j in range(28):
-            sub_dataset[i][j] = train_3d[i][j]
-
-    # Covert 0-255 to 0 and 1
-    for i in range(tested_data_size):
-        for j in range(28):
-            for k in range(28):
-                if sub_dataset[i][j][k] > 127:
-                    converted_dataset[i][j][k] = 1
-                else:
-                    converted_dataset[i][j][k] = 0
-
-    return converted_dataset
-
-
-def convert_y_data():
+def convert_y_data(data, size):
     print("Converting y-data...")
-    train_3d = load_training_data_y()
-    converted_dataset = np.zeros(len(train_3d))
-    for i in range(len(train_3d)):
-        converted_dataset[i] = train_3d[i]
-    return converted_dataset
-
-
-def convert_y_test_data():
-    test_3d = load_test_data_y()
-    converted_dataset = np.zeros(len(test_3d))
-    for i in range(len(test_3d)):
-        converted_dataset[i] = test_3d[i]
+    converted_dataset = data[:size]
     return converted_dataset
 
 
 def start():
     print("Starting...")
     time_start = time.time()
-    trained_x = convert_x_data()
-    trained_y = convert_y_data()
-    test_x = convert_x_test_data()
-    test_y = convert_y_test_data()
+    x_train, y_train, x_test, y_test = load_data()
+    trained_x = convert_x_data(x_train, trained_x_data_size)
+    trained_y = convert_y_data(y_train, trained_x_data_size)
+    test_x = convert_x_data(x_test, tested_x_data_size)
+    test_y = convert_y_data(y_test, 10000)
 
     # Check trained data vs tested data
     # False, array checks only corresponding entries
@@ -110,14 +46,14 @@ def start():
     amount_correct = 0
     # 1st loop through tested data
     print("Testing dataset...")
-    for i in range(tested_data_size):
+    for i in range(tested_x_data_size):
         # reset of probability on each tested object
         # index - index of best trained element for the tested element
         probability_best = 0
         index = 0
         current_tested_x = test_x[i]
         # 2nd loop through trained data for each tested data
-        for j in range(trained_data_size):
+        for j in range(trained_x_data_size):
             # list_ones, zeroes for probability check
             current_trained_x = trained_x[j]
             list_ones = []
@@ -135,7 +71,7 @@ def start():
                 probability_best = probability
                 index = j
             # at the end of 2nd loop the index_list and probability_lists are updated
-            if j == trained_data_size - 1:
+            if j == trained_x_data_size - 1:
                 index_list.append(index)
                 probability_list.append(str(round(probability_best * 100, 2)) + '%')
 
@@ -148,8 +84,8 @@ def start():
         print('Probability: ' + probability_list[i] + ' | Number: ' + str(final_list[i]))
 
     time_end = time.time()
-    print('Runtime: ' + str(round(time_end - time_start, 2)) + ' seconds with ' + str(trained_data_size)
-          + ' training data entries and ' + str(tested_data_size) + ' test data entries')
+    print('Runtime: ' + str(round(time_end - time_start, 2)) + ' seconds with ' + str(trained_x_data_size)
+          + ' training data entries and ' + str(tested_x_data_size) + ' test data entries')
 
 
 start()
