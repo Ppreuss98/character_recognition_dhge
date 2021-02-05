@@ -23,9 +23,8 @@ predictions = model(x_train[:1]).numpy()
 # Apply softmax to output, squish sum of predictions for numbers between 0 and 1
 tf.nn.softmax(predictions).numpy()
 
-# smth about entropy loss, dunno
-loss_fn = tf.keras.losses.MeanAbsoluteError()
-# loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+# Crossentropy loss
+loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 loss_fn(y_train[:1], predictions).numpy()
 
 # Creation of model
@@ -39,16 +38,15 @@ model.fit(x_train, y_train, epochs=5)
 # Evaluation of accuracy based on test data
 model.evaluate(x_test,  y_test, verbose=2)
 
-# New model for probability??
+# New model for probability
 probability_model = tf.keras.Sequential([
   model,
   tf.keras.layers.Softmax()
 ])
-probability_model(x_test[:5])
 
 # Actual predictions
-predictions = model.predict(x_test)
-# Take biggest arg and take the corresponding number?
+predictions = probability_model.predict(x_test)
+# Take biggest arg and take the corresponding number
 classes = np.argmax(predictions, axis=1)
 
 print(classes)

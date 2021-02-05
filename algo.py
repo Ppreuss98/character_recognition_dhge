@@ -3,7 +3,7 @@ import tensorflow as tf
 import time
 
 tested_x_data_size = 100
-trained_x_data_size = 1000
+trained_x_data_size = 10000
 
 
 def load_data():
