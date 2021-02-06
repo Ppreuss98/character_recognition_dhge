@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 import time
 
-tested_x_data_size = 100
-trained_x_data_size = 10000
+tested_x_data_size = 1000
+trained_x_data_size = 60000
 
 
 def load_data():
@@ -64,7 +64,7 @@ def check_matches(trained_x, trained_y, test_x, test_y):
         for j in range(trained_x_data_size):
             current_trained_x = trained_x[j]
             matches = current_tested_x[:28, :28] == current_trained_x[:28, :28]
-            probability = np.divide(np.count_nonzero(matches == 0), np.count_nonzero(matches))
+            probability = np.divide(np.count_nonzero(matches), 784)
 
             # If probability of an entry is higher, then probability and index for the corresponding y-value get updated
             if probability > probability_best:
