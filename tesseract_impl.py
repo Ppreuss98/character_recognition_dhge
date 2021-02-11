@@ -8,7 +8,6 @@ def tess_setup():
 
 def alter_image(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img = cv2.GaussianBlur(img, (3,3), 0)
     img = cv2.Canny(img, 150, 200)
     return img
 
