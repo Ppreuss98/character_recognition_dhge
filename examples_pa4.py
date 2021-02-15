@@ -18,3 +18,8 @@ ax.set_xlabel("x")
 ax.set_ylabel("y")
 
 plt.show()
+
+
+def creation_2d():
+    numpy_array = np.array([[1, 2], [3, 4]])
+    print(numpy_array)

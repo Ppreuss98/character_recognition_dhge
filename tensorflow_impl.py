@@ -49,5 +49,6 @@ predictions = probability_model.predict(x_test)
 # Take biggest arg and take the corresponding number
 classes = np.argmax(predictions, axis=1)
 
+
 print(classes)
 
